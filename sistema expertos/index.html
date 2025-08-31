@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Sistema Experto Café</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f5f2ed;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+      }
+      .container {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        width: 450px;
+      }
+      h2 {
+        text-align: center;
+        margin-bottom: 1rem;
+        color: #4a2d1c;
+      }
+      label {
+        display: block;
+        margin-top: 1rem;
+        font-weight: bold;
+        color: #333;
+      }
+      input,
+      select {
+        width: 100%;
+        padding: 0.6rem;
+        margin-top: 0.4rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 0.95rem;
+      }
+      button {
+        margin-top: 1.5rem;
+        width: 100%;
+        padding: 0.9rem;
+        background: #6b4226;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background 0.3s;
+      }
+      button:hover {
+        background: #4a2d1c;
+      }
+      .results {
+        margin-top: 1.5rem;
+      }
+      .card {
+        background: #fafafa;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s;
+      }
+      .card:hover {
+        transform: translateY(-2px);
+      }
+      .card h3 {
+        margin: 0 0 0.5rem 0;
+        color: #6b4226;
+      }
+      .card p {
+        margin: 0.3rem 0;
+        font-size: 0.9rem;
+        color: #444;
+      }
+      .empty {
+        text-align: center;
+        color: #777;
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>☕ Sistema Experto Café</h2>
+      <form id="coffeeForm">
+        <label for="name">Nombre</label>
+        <input type="text" id="name" required />
+
+        <label for="preparation">Preparación preferida</label>
+        <select id="preparation" required>
+          <option value="espresso">Espresso</option>
+          <option value="capuccino">Capuccino</option>
+          <option value="latte">Latte</option>
+          <option value="americano">Americano</option>
+          <option value="cold brew">Cold Brew</option>
+        </select>
+
+        <label for="mood">Estado de ánimo</label>
+        <select id="mood" required>
+          <option value="cansado">Cansado</option>
+          <option value="estresado">Estresado</option>
+          <option value="feliz">Feliz</option>
+          <option value="relajado">Relajado</option>
+        </select>
+
+        <button type="submit">Evaluar</button>
+      </form>
+
+      <div class="results" id="results">
+        <p class="empty">Aquí aparecerán las recomendaciones...</p>
+      </div>
+    </div>
+
+    <script>
+      const API_URL = "http://127.0.0.1:8000";
+
+      document
+        .getElementById("coffeeForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const name = document.getElementById("name").value;
+          const prefered_preparation =
+            document.getElementById("preparation").value;
+          const mood = document.getElementById("mood").value;
+
+          try {
+            const response = await fetch(`${API_URL}/evaluate`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ name, prefered_preparation, mood }),
+            });
+
+            const data = await response.json();
+            const resultsDiv = document.getElementById("results");
+            resultsDiv.innerHTML = "";
+
+            if (!data || data.length === 0) {
+              resultsDiv.innerHTML =
+                "<p class='empty'>No se encontró recomendación para esta combinación.</p>";
+            } else {
+              const person = data.find((item) => item.fact_rule === "person");
+              const coffee = data.find((item) => item.fact_rule === "coffee");
+
+              if (person) {
+                const cardPerson = document.createElement("div");
+                cardPerson.className = "card";
+                cardPerson.innerHTML = `
+                  <h3>👤 ${person.fact_conditions.name}</h3>
+                  <p><b>Preparación preferida:</b> ${person.fact_conditions.prefered_preparation}</p>
+                  <p><b>Estado de ánimo:</b> ${person.fact_conditions.mood}</p>
+                `;
+                resultsDiv.appendChild(cardPerson);
+              }
+
+              if (coffee) {
+                const cardCoffee = document.createElement("div");
+                cardCoffee.className = "card";
+                cardCoffee.innerHTML = `
+                  <h3>☕ Recomendación: ${coffee.fact_conditions.coffee_name}</h3>
+                  <p><b>Preparación:</b> ${coffee.fact_conditions.preparation}</p>
+                  <p><b>Origen:</b> ${coffee.fact_conditions.origin}</p>
+                  <p><b>Nivel de cafeína:</b> ${coffee.fact_conditions.caffeine_level}</p>
+                  <p><b>Estado de ánimo:</b> ${coffee.fact_conditions.mood}</p>
+                `;
+                resultsDiv.appendChild(cardCoffee);
+              }
+            }
+          } catch (err) {
+            document.getElementById("results").innerHTML =
+              "<p class='empty'>Error en la evaluación (no se pudo conectar al servidor).</p>";
+            console.error(err);
+          }
+        });
+    </script>
+  </body>
+</html>
