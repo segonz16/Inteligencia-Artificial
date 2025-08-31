@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistema Difuso de Café — Frontend</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      html {
+        font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto,
+          Helvetica, Arial, sans-serif;
+      }
+      .glass {
+        backdrop-filter: blur(8px);
+        background: rgb(255 255 255 / 0.6);
+      }
+      .dark .glass {
+        background: rgb(17 24 39 / 0.6);
+      }
+      .slider {
+        accent-color: #8b5cf6;
+      }
+    </style>
+  </head>
+  <body
+    class="min-h-screen bg-gradient-to-br from-amber-50 via-rose-50 to-emerald-50 dark:from-gray-950 dark:via-slate-900 dark:to-stone-900 text-gray-900 dark:text-gray-100"
+  >
+    <div class="max-w-6xl mx-auto p-4 md:p-8">
+      <!-- Header -->
+      <header class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            class="w-8 h-8 text-amber-600"
+          >
+            <path
+              d="M3 8a4 4 0 014-4h9a4 4 0 014 4v3a5 5 0 01-5 5H8a5 5 0 01-5-5V8z"
+            />
+            <path
+              d="M4 16h16a2 2 0 012 2 4 4 0 01-4 4H6a4 4 0 01-4-4 2 2 0 012-2z"
+            />
+          </svg>
+          <div>
+            <h1 class="text-2xl md:text-3xl font-extrabold leading-tight">
+              Sistema Difuso de Café
+            </h1>
+            <p class="text-sm text-gray-600 dark:text-gray-300"></p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button
+            id="themeToggle"
+            class="px-3 py-2 text-sm rounded-xl glass shadow-sm border border-white/40 dark:border-white/10 hover:shadow transition"
+          >
+            🌗 Tema
+          </button>
+          <button
+            id="openSettings"
+            class="px-3 py-2 text-sm rounded-xl glass shadow-sm border border-white/40 dark:border-white/10 hover:shadow transition"
+          >
+            ⚙️ API
+          </button>
+        </div>
+      </header>
+
+      <!-- Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <!-- Panel de controles -->
+        <section
+          class="lg:col-span-2 p-5 rounded-2xl glass shadow border border-white/40 dark:border-white/10"
+        >
+          <!-- Hora -->
+          <div class="mb-6">
+            <label for="hora" class="flex items-center justify-between mb-2">
+              <span class="font-medium">Hora del día</span>
+              <span class="text-sm text-gray-600 dark:text-gray-300"
+                ><span id="horaVal">8</span>:00</span
+              >
+            </label>
+            <input
+              id="hora"
+              type="range"
+              min="0"
+              max="24"
+              step="1"
+              value="8"
+              class="w-full slider"
+            />
+            <div
+              class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mt-1"
+            >
+              <span>0</span><span>6</span><span>12</span><span>18</span
+              ><span>24</span>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">
+              0–6: madrugada · 6–12: mañana · 12–18: tarde · 18–24: noche
+            </p>
+          </div>
+
+          <!-- Estado -->
+          <div class="mb-6">
+            <label for="estado" class="flex items-center justify-between mb-2">
+              <span class="font-medium">Estado de ánimo</span>
+              <span class="text-sm text-gray-600 dark:text-gray-300"
+                >(<span id="estadoVal">5</span>/10)</span
+              >
+            </label>
+            <input
+              id="estado"
+              type="range"
+              min="0"
+              max="10"
+              step="1"
+              value="5"
+              class="w-full slider"
+            />
+            <div
+              class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mt-1"
+            >
+              <span>Triste</span><span>Normal</span><span>Feliz</span>
+            </div>
+          </div>
+
+          <!-- Clima -->
+          <div class="mb-6">
+            <label for="clima" class="flex items-center justify-between mb-2">
+              <span class="font-medium">Clima (°C)</span>
+              <span class="text-sm text-gray-600 dark:text-gray-300"
+                ><span id="climaVal">20</span>°C</span
+              >
+            </label>
+            <input
+              id="clima"
+              type="range"
+              min="0"
+              max="40"
+              step="1"
+              value="20"
+              class="w-full slider"
+            />
+            <div
+              class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mt-1"
+            >
+              <span>Frío</span><span>Templado</span><span>Caliente</span>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-3">
+            <button
+              id="btnEvaluar"
+              class="px-4 py-2 rounded-xl bg-amber-600 text-white font-semibold shadow hover:opacity-90 active:scale-95 transition"
+            >
+              Evaluar recomendación
+            </button>
+            <button
+              id="btnVisualizacion"
+              class="px-4 py-2 rounded-xl bg-gray-900 text-white dark:bg-white dark:text-gray-900 font-semibold shadow hover:opacity-90 active:scale-95 transition"
+            >
+              Ver funciones de membresía
+            </button>
+          </div>
+        </section>
+
+        <!-- Panel de resultados -->
+        <section
+          class="lg:col-span-3 p-5 rounded-2xl glass shadow border border-white/40 dark:border-white/10"
+        >
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold">Resultado</h2>
+            <span id="status" class="text-sm text-gray-500"></span>
+          </div>
+          <div
+            class="aspect-video w-full rounded-xl overflow-hidden border border-white/40 dark:border-white/10 bg-white/70 dark:bg-gray-900/60 flex items-center justify-center"
+          >
+            <img
+              id="imgResultado"
+              alt="Resultado de la evaluación"
+              class="max-h-full max-w-full"
+            />
+            <div id="placeholder" class="text-center p-6 text-sm text-gray-500">
+              <p>👋 Aún no hay resultado.</p>
+              <p>
+                Usa <span class="font-medium">Evaluar recomendación</span> o
+                <span class="font-medium">Ver funciones de membresía</span>.
+              </p>
+            </div>
+          </div>
+
+          <!-- Ayuda rápida -->
+          <details
+            class="mt-5 text-sm open:shadow open:border open:border-white/40 open:dark:border-white/10 open:rounded-xl"
+          >
+            <summary
+              class="cursor-pointer select-none px-3 py-2 rounded-xl bg-white/50 dark:bg-gray-900/50"
+            >
+              ¿Cómo se interpreta el número de café?
+            </summary>
+            <div class="p-4">
+              <p>
+                El sistema devuelve un valor de 0 a 10 (difuso), mapeado así:
+              </p>
+              <ul class="list-disc ml-6 mt-2">
+                <li>0–4 ≈ <strong>Suave</strong></li>
+                <li>3–7 ≈ <strong>Medio</strong></li>
+                <li>6–10 ≈ <strong>Fuerte</strong></li>
+              </ul>
+            </div>
+          </details>
+        </section>
+      </div>
+
+      <!-- Modal de configuración -->
+      <dialog
+        id="settingsModal"
+        class="p-0 rounded-2xl w-full max-w-xl backdrop:bg-black/40"
+      >
+        <form
+          method="dialog"
+          class="glass p-6 border border-white/40 dark:border-white/10 rounded-2xl"
+        >
+          <h3 class="text-lg font-semibold mb-4">Configuración de la API</h3>
+          <label class="block text-sm font-medium mb-2" for="apiBase"
+            >URL base</label
+          >
+          <input
+            id="apiBase"
+            type="text"
+            class="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white/70 dark:bg-gray-900/60"
+            placeholder="http://127.0.0.1:8000"
+          />
+          <div class="flex justify-end gap-2 mt-5">
+            <button
+              class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-800"
+              value="cancel"
+            >
+              Cancelar
+            </button>
+            <button
+              id="saveApi"
+              class="px-4 py-2 rounded-xl bg-emerald-600 text-white"
+              value="default"
+            >
+              Guardar
+            </button>
+          </div>
+        </form>
+      </dialog>
+    </div>
+
+    <script>
+      const apiBaseInput = document.getElementById("apiBase");
+      const settingsModal = document.getElementById("settingsModal");
+      const openSettingsBtn = document.getElementById("openSettings");
+      const saveApiBtn = document.getElementById("saveApi");
+
+      const hora = document.getElementById("hora");
+      const horaVal = document.getElementById("horaVal");
+      const estado = document.getElementById("estado");
+      const estadoVal = document.getElementById("estadoVal");
+      const clima = document.getElementById("clima");
+      const climaVal = document.getElementById("climaVal");
+
+      const btnEvaluar = document.getElementById("btnEvaluar");
+      const btnVisualizacion = document.getElementById("btnVisualizacion");
+      const btnDescargar = document.getElementById("btnDescargar");
+
+      const imgResultado = document.getElementById("imgResultado");
+      const placeholder = document.getElementById("placeholder");
+      const statusEl = document.getElementById("status");
+
+      const themeToggle = document.getElementById("themeToggle");
+
+      const DEFAULT_API = "http://localhost:8000";
+      let API_BASE = localStorage.getItem("api_base") || DEFAULT_API;
+
+      function setStatus(msg) {
+        statusEl.textContent = msg || "";
+      }
+
+      function showImageFromBlob(blob, filenameHint = "resultado.png") {
+        const url = URL.createObjectURL(blob);
+        imgResultado.src = url;
+        imgResultado.onload = () => URL.revokeObjectURL(url);
+        imgResultado.classList.remove("hidden");
+        placeholder.classList.add("hidden");
+        btnDescargar.href = url;
+        btnDescargar.download = filenameHint;
+        btnDescargar.classList.remove("hidden");
+      }
+
+      async function fetchImage(url, options) {
+        setStatus("Cargando…");
+        try {
+          const res = await fetch(url, options);
+          if (!res.ok)
+            throw new Error("HTTP " + res.status + " – " + (await res.text()));
+          const blob = await res.blob();
+          setStatus("Listo");
+          return blob;
+        } catch (err) {
+          console.error(err);
+          setStatus("Error: " + err.message);
+          alert(
+            "No se pudo obtener la imagen.\n" +
+              err.message +
+              "\n\nVerifica que la API esté corriendo y la URL base sea correcta."
+          );
+          throw err;
+        }
+      }
+
+      function updateLabels() {
+        horaVal.textContent = hora.value;
+        estadoVal.textContent = estado.value;
+        climaVal.textContent = clima.value;
+      }
+
+      [hora, estado, clima].forEach((el) =>
+        el.addEventListener("input", updateLabels)
+      );
+
+      btnEvaluar.addEventListener("click", async () => {
+        const payload = {
+          hora: Number(hora.value),
+          estado: Number(estado.value),
+          clima: Number(clima.value),
+        };
+        const url = API_BASE.replace(/\/$/, "") + "/evaluar";
+        const blob = await fetchImage(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        showImageFromBlob(blob, "recomendacion_cafe.png");
+      });
+
+      btnVisualizacion.addEventListener("click", async () => {
+        const url = API_BASE.replace(/\/$/, "") + "/visualizacion";
+        const blob = await fetchImage(url, { method: "GET" });
+        showImageFromBlob(blob, "visualizacion_membresias.png");
+      });
+
+      openSettingsBtn.addEventListener("click", () => {
+        apiBaseInput.value = API_BASE;
+        settingsModal.showModal();
+      });
+      saveApiBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const val = apiBaseInput.value.trim() || DEFAULT_API;
+        API_BASE = val;
+        localStorage.setItem("api_base", API_BASE);
+        settingsModal.close();
+        setStatus("API: " + API_BASE);
+      });
+
+      function applyTheme() {
+        const pref = localStorage.getItem("theme") || "auto";
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)"
+        ).matches;
+        const shouldDark = pref === "dark" || (pref === "auto" && prefersDark);
+        document.documentElement.classList.toggle("dark", shouldDark);
+      }
+      themeToggle.addEventListener("click", () => {
+        const current = localStorage.getItem("theme") || "auto";
+        const next =
+          current === "light" ? "dark" : current === "dark" ? "auto" : "light";
+        localStorage.setItem("theme", next);
+        applyTheme();
+      });
+
+      (function init() {
+        applyTheme();
+        updateLabels();
+        setStatus("API: " + API_BASE);
+      })();
+    </script>
+  </body>
+</html>
