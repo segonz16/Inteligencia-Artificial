@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculadora de Riesgo de Hipertensión (Red Neuronal)</title>
+    <style>
+      /* Estilos CSS (Se mantienen los tuyos, modernos y limpios) */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        padding: 40px;
+        max-width: 500px;
+        width: 100%;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 10px;
+        font-size: 28px;
+        text-align: center;
+      }
+
+      .subtitle {
+        color: #666;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 14px;
+      }
+
+      .form-group {
+        margin-bottom: 25px;
+      }
+
+      label {
+        display: block;
+        color: #555;
+        font-weight: 600;
+        margin-bottom: 8px;
+        font-size: 14px;
+      }
+
+      input[type="number"] {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+      }
+
+      input[type="number"]:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .info-text {
+        font-size: 12px;
+        color: #888;
+        margin-top: 4px;
+      }
+
+      button {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        margin-top: 10px;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      .result {
+        margin-top: 30px;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 600;
+        display: none;
+      }
+
+      .result.show {
+        display: block;
+        animation: slideIn 0.5s ease;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .result.risk {
+        background: #fee;
+        color: #c33;
+        border: 2px solid #fcc;
+      }
+
+      .result.no-risk {
+        background: #efe;
+        color: #3c3;
+        border: 2px solid #cfc;
+      }
+
+      .result-icon {
+        font-size: 40px;
+        margin-bottom: 10px;
+      }
+
+      .result-text {
+        font-size: 16px;
+        margin-top: 10px;
+        font-weight: normal;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🧠 Calculadora de Riesgo de Hipertensión</h1>
+      <p class="subtitle">
+        Modelo basado en **Red Neuronal (Keras)** entrenada con datos
+        normalizados.
+      </p>
+
+      <form id="hypertensionForm">
+        <div class="form-group">
+          <label for="edad">Edad (años)</label>
+          <input type="number" id="edad" required min="0" max="120" />
+        </div>
+
+        <div class="form-group">
+          <label for="imc">IMC (Índice de Masa Corporal)</label>
+          <input
+            type="number"
+            id="imc"
+            step="0.01"
+            required
+            min="10"
+            max="60"
+          />
+          <div class="info-text">Permite decimales (ej: 25.5)</div>
+        </div>
+
+        <div class="form-group">
+          <label for="presion">Presión Arterial (mmHg)</label>
+          <input
+            type="number"
+            id="presion"
+            step="0.01"
+            required
+            min="50"
+            max="250"
+          />
+          <div class="info-text">Permite decimales (ej: 120.5)</div>
+        </div>
+
+        <div class="form-group">
+          <label for="sal">Consumo de Sal (1-5)</label>
+          <input type="number" id="sal" required min="1" max="5" />
+          <div class="info-text">1 = Bajo, 5 = Alto</div>
+        </div>
+
+        <div class="form-group">
+          <label for="actividad">Actividad Física (1-5)</label>
+          <input type="number" id="actividad" required min="1" max="5" />
+          <div class="info-text">1 = Sedentario, 5 = Muy activo</div>
+        </div>
+
+        <button type="submit">Calcular Riesgo (Red Neuronal)</button>
+      </form>
+
+      <div id="result" class="result">
+        <div class="result-icon"></div>
+        <div id="resultText"></div>
+        <div class="result-text" id="resultDescription"></div>
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById("hypertensionForm");
+      const resultDiv = document.getElementById("result");
+      const resultText = document.getElementById("resultText");
+      const resultDescription = document.getElementById("resultDescription");
+      const resultIcon = document.querySelector(".result-icon");
+
+      // 1. !!! PESOS DE LA RED NEURONAL ENTRENADA (W) !!!
+      // Estos son los pesos obtenidos de model.get_weights()[0].flatten()
+      // Sustituye estos valores por los que obtuviste de tu entrenamiento de Keras.
+      const PESOS_W = [
+        0.158782, // Peso para Edad
+        0.587213, // Peso para IMC
+        0.189405, // Peso para PresionArterial
+        1.0921, // Peso para ConsumoSal
+        -1.787999, // Peso para ActividadFisica
+      ];
+
+      // 2. !!! SESGO DE LA RED NEURONAL ENTRENADA (b) !!!
+      // Este es el sesgo obtenido de model.get_weights()[1][0]
+      // Sustituye este valor por el que obtuviste de tu entrenamiento de Keras.
+      const SESGO_B = -0.575308; // Ejemplo
+
+      // 3. !!! PARÁMETROS DE NORMALIZACIÓN (StandardScaler) !!!
+      // Esto es crucial. Los valores deben ser la media (mean) y la desviación
+      // estándar (std) de X_train que usaste para entrenar.
+      // Si no usas estos valores, la predicción será incorrecta.
+      const MEDIA = [
+        45.19, // Media de Edad en X_train
+        29.85, // Media de IMC en X_train
+        134.5, // Media de PresionArterial en X_train
+        2.55, // Media de ConsumoSal en X_train
+        2.54, // Media de ActividadFisica en X_train
+      ];
+
+      const STD = [
+        18.5, // STD de Edad en X_train
+        6.05, // STD de IMC en X_train
+        26.0, // STD de PresionArterial en X_train
+        1.11, // STD de ConsumoSal en X_train
+        1.11, // STD de ActividadFisica en X_train
+      ];
+      // Nota: Si usaste un StandardScaler, los valores de MEDIA y STD son los que debes usar aquí.
+      // Usa las medias y desviaciones estándar de las 5 columnas de X_train.
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        // Obtener valores de entrada originales
+        const entradas_originales = [
+          parseFloat(document.getElementById("edad").value),
+          parseFloat(document.getElementById("imc").value),
+          parseFloat(document.getElementById("presion").value),
+          parseFloat(document.getElementById("sal").value),
+          parseFloat(document.getElementById("actividad").value),
+        ];
+
+        // 4. NORMALIZACIÓN DE DATOS DE ENTRADA (Mismo proceso que Standard Scaler)
+        // Valor Normalizado (X_norm) = (X_original - Media) / Desviación Estándar
+        const entradas_normalizadas = entradas_originales.map((valor, i) => {
+          return (valor - MEDIA[i]) / STD[i];
+        });
+
+        // 5. CALCULAR Z (Combinación Lineal de la Red Neuronal)
+        // Z = b + W1*X1_norm + W2*X2_norm + ...
+        let Z = SESGO_B;
+        for (let i = 0; i < entradas_normalizadas.length; i++) {
+          Z += PESOS_W[i] * entradas_normalizadas[i];
+        }
+
+        // 6. Aplicar función sigmoide (Probabilidad de la Red Neuronal)
+        const probabilidad = 1 / (1 + Math.exp(-Z));
+
+        // Determinar riesgo (umbral 0.5)
+        const tieneRiesgo = probabilidad >= 0.5 ? 1 : 0;
+
+        // Mostrar resultado
+        resultDiv.classList.remove("risk", "no-risk");
+        resultDiv.classList.add("show");
+
+        if (tieneRiesgo === 1) {
+          resultDiv.classList.add("risk");
+          resultIcon.textContent = "⚠️";
+          resultText.textContent = "RIESGO DE HIPERTENSIÓN DETECTADO";
+          resultDescription.textContent = `Probabilidad: ${(
+            probabilidad * 100
+          ).toFixed(
+            1
+          )}%. Se recomienda consultar con un profesional de la salud.`;
+        } else {
+          resultDiv.classList.add("no-risk");
+          resultIcon.textContent = "✅";
+          resultText.textContent = "RIESGO BAJO DE HIPERTENSIÓN";
+          resultDescription.textContent = `Probabilidad: ${(
+            probabilidad * 100
+          ).toFixed(1)}%. Continúe con hábitos saludables.`;
+        }
+      });
+    </script>
+  </body>
+</html>
